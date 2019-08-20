@@ -12,11 +12,11 @@
 					</view>
 					<view class="good-item-right">
 						<text class="name">{{item.name}}</text>
-						<text class="desc">{{item.desc}}</text>
+						<text class="desc text-ellipsis">{{item.desc}}</text>
 						<view class="ctrl-module">
 							<view class="price-list ">
 								<text class="new text-price">{{item.price}}</text>
-								<text class="old text-price">¥:{{item.oldPrice}}</text>
+								<text class="old text-price">{{item.oldPrice}}</text>
 							</view>
 							<view class="ctrl-btns">
 								<button class="cu-btn line-green round sm" v-show="item.count>0" @click.stop="changeCount(item,false)">-</button>
@@ -37,11 +37,11 @@
 				<text class="select-all">全选</text>
 			</view>
 			<view class="cart-total">
-				<text class="text-total">合计:$<text class="total-val">127.30</text></text>
+				<text class="text-total">合计:<text class="total-val text-price">{{totalPrice}}</text></text>
 				<text class="text-discount">已优惠:$<text  class="discount-val">36.0</text>(免运费)</text>
 			</view>
 			<view class="cart-submit">
-				<button type="primary" size="mini">去结算</button>
+				<button type="primary" size="mini" @click="goBalance" :disabled="canGo">去结算</button>
 			</view>
 		</view>
 	</page>
@@ -63,9 +63,20 @@
 				let total = 0;
 				this.classifyData.forEach(item => {
 					if(item.isSelect){
-						total += item.price
+						total += item.price * 1000 * item.count
 					}
 				})
+				
+				return total / 1000
+			},
+			canGo(){
+				let flag = true;
+				this.classifyData.forEach(item => {
+					if(item.isSelect){
+						flag = false
+					}
+				})
+				return flag ? true : false
 			}
 		},
 		created(){
@@ -74,7 +85,8 @@
 		},
 		methods:{
 			...mapMutations([
-				"changeGoodCount"
+				"changeGoodCount",
+				"createNewBalance"
 			]),
 			changeCount(item,t){
 				const _that = this
@@ -121,9 +133,26 @@
 					item.isSelect = !_that.allSelect  ? true : false
 				})
 				_that.allSelect = !_that.allSelect
+			},
+			// 创建结算单
+			goBalance(){
+				let _that = this;
+				let balance = [];
+				_that.classifyData.forEach(item => {
+					if(item.isSelect){
+						balance.push(item)
+					}
+				})
+
+				_that.createNewBalance(balance)
+				// 跳转
+				uni.navigateTo({
+					url:'/pages/balance/balance'
+				})
 				
 			}
-		}
+		},
+		
 	}
 </script>
 

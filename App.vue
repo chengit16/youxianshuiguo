@@ -26,21 +26,21 @@
 		created(){
 			this.updateGoodslist(classifyData)
 		},
-		watch:{
-			l(val,val1){
-				console.log(val)
-				if (val == 0) {
-					uni.removeTabBarBadge({
-						index: 2
-					})
-				}else{
-					uni.setTabBarBadge({
-					  index: 2,
-					  text: `${val}`
-					})
-				}
-			}
-		}
+		// watch:{
+		// 	l(val,val1){
+		// 		console.log(val)
+		// 		if (val == 0) {
+		// 			uni.removeTabBarBadge({
+		// 				index: 2
+		// 			})
+		// 		}else{
+		// 			uni.setTabBarBadge({
+		// 			  index: 2,
+		// 			  text: `${val}`
+		// 			})
+		// 		}
+		// 	}
+		// }
 	}
 </script>
 
@@ -130,12 +130,7 @@
 			text-decoration:line-through;
 		}
 	}
-	.line-green{
-		color:#5EA046;
-	}
-	.bg-green{
-		background:#5EA046;
-	}
+
 	// module title
 	.demo-title{
 		.title-name{
@@ -147,10 +142,21 @@
 			color:#888888;
 		}
 	}
+	// 超出省略
 	
+	.text-ellipsis{
+		overflow:hidden;
+		text-overflow:ellipsis;
+		display:-webkit-box;
+		-webkit-line-clamp:1;
+		-webkit-box-orient:vertical;
+	}
 	// 字体大小
+	.size-16rpx{
+		font-size: 16rpx !important;
+	}
 	.size-20rpx{
-		font-size: 20rpx;
+		font-size: 20rpx !important;
 	}
 	.size-24rpx{
 		font-size: 24rpx !important;
@@ -185,5 +191,38 @@
 	}
 	.color-5ea046{
 		color:#5EA046 !important;
+	}
+	.color-9b{
+		color:#9B9B9B !important;
+	}
+	
+	.line-green{
+		color:#5EA046;
+	}
+	.bg-green{
+		background:#5EA046;
+	}
+	.bg-f6{
+		background:#F6F6F6;
+	}
+	
+	.padding-20{
+		padding:20rpx;
+	}
+	.padding-tb10-lr20{
+		padding:10rpx 20rpx;
+	}
+	//
+	.margin-bottom-10{
+		margin-bottom: 10rpx;
+	}
+	.margin-top-10{
+		margin-top: 10rpx;
+	}
+	.margin-right-10{
+		margin-right: 10rpx;
+	}
+	.margin-left-10{
+		margin-left: 10rpx;
 	}
 </style>

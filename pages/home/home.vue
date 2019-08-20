@@ -73,7 +73,7 @@
 							</view>
 							<view class="good-item-right">
 								<text class="name">{{item.name}}</text>
-								<text class="desc">{{item.desc}}</text>
+								<text class="desc text-ellipsis">{{item.desc}}</text>
 								<view class="ctrl-module">
 									<view class="price-list ">
 										<text class="new text-price">{{item.price}}</text>
