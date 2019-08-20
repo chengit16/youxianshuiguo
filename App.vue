@@ -26,21 +26,21 @@
 		created(){
 			this.updateGoodslist(classifyData)
 		},
-		// watch:{
-		// 	l(val,val1){
-		// 		console.log(val)
-		// 		if (val == 0) {
-		// 			uni.removeTabBarBadge({
-		// 				index: 2
-		// 			})
-		// 		}else{
-		// 			uni.setTabBarBadge({
-		// 			  index: 2,
-		// 			  text: `${val}`
-		// 			})
-		// 		}
-		// 	}
-		// }
+		watch:{
+			l(val,val1){
+				console.log(val)
+				if (val == 0) {
+					uni.removeTabBarBadge({
+						index: 2
+					})
+				}else{
+					uni.setTabBarBadge({
+					  index: 2,
+					  text: `${val}`
+					})
+				}
+			}
+		}
 	}
 </script>
 
@@ -142,6 +142,26 @@
 			color:#888888;
 		}
 	}
+	
+	// 计算 订单通用数量模板
+	.balance-list{
+		.balance-item{
+			.left{
+				image{
+					width: 100rpx;
+					height: 100rpx;
+				}
+			}
+			.center{
+				margin-right:30rpx;
+			}
+			.right{
+				margin-left: auto;
+			}
+		}
+	}
+	
+	
 	// 超出省略
 	
 	.text-ellipsis{
@@ -150,6 +170,9 @@
 		display:-webkit-box;
 		-webkit-line-clamp:1;
 		-webkit-box-orient:vertical;
+	}
+	.font-weight500{
+		font-weight: 500;
 	}
 	// 字体大小
 	.size-16rpx{
@@ -199,13 +222,18 @@
 	.line-green{
 		color:#5EA046;
 	}
+	.lines-green{
+		color:#5EA046;
+	}
 	.bg-green{
 		background:#5EA046;
 	}
 	.bg-f6{
 		background:#F6F6F6;
 	}
-	
+	.bg-fff{
+		background:#FFFFFF;
+	}
 	.padding-20{
 		padding:20rpx;
 	}

@@ -5,104 +5,8 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
 	state: {
 		goodslist: [],
-		cartlist: [{
-				"id":1,
-				"name": "泰国金1111枕榴莲1份 - 约500克",
-				"price": "18.00",
-				"oldPrice": "17.99",
-				"src": "http://ww1.sinaimg.cn/large/8b283c03gy1g5x4cpgtlpj206w078q4c.jpg",
-				"desc": "金枕榴莲,水果之王,香味浓郁,口岸软糯,营养丰富",
-				"key": "泰国金枕榴莲",
-				"cat":1,
-				"isSelect":false,
-				"count":2
-			},
-			{
-				"id":2,
-				"name": "美国2222车厘子1份 - 约500克",
-				"price": "18.00",
-				"oldPrice": "17.99",
-				"src": "http://ww1.sinaimg.cn/large/8b283c03gy1g5x4cpgylvj206w078jt7.jpg",
-				"desc": "把这份甘甜空运到你的舌尖",
-				"key":"美国车厘子",
-				"cat":1,
-				"isSelect":false,
-				"count":4
-			},
-			{
-				"id":3,
-				"name": "3333小黄瓜+小番茄+葡萄切三拼 - 500克",
-				"price": "18.00",
-				"oldPrice": "17.99",
-				"src": "http://ww1.sinaimg.cn/large/8b283c03gy1g5x4cpgu79j206w080mys.jpg",
-				"desc": "营养均衡,小数节课",
-				"key":"黄瓜",
-				"cat":1,
-				"isSelect":false,
-				"count":3
-			},
-			{
-				"id":4,
-				"name": "444西班牙香橙1份 - 约500克",
-				"price": "18.00",
-				"oldPrice": "17.99",
-				"src": "http://ww1.sinaimg.cn/large/8b283c03gy1g5x4cph1tsj206w08040h.jpg",
-				"desc": "汁水四溢,口岸甘甜",
-				"key":"香橙",
-				"cat":1,
-				"isSelect":false,
-				"count":3
-			},
-		],
-		newBalance:[{
-				"id":1,
-				"name": "泰国金1111枕榴莲1份 - 约500克",
-				"price": "18.00",
-				"oldPrice": "17.99",
-				"src": "http://ww1.sinaimg.cn/large/8b283c03gy1g5x4cpgtlpj206w078q4c.jpg",
-				"desc": "金枕榴莲,水果之王,香味浓郁,口岸软糯,营养丰富",
-				"key": "泰国金枕榴莲",
-				"cat":1,
-				"isSelect":false,
-				"count":2
-			},
-			{
-				"id":2,
-				"name": "美国2222车厘子1份 - 约500克",
-				"price": "18.00",
-				"oldPrice": "17.99",
-				"src": "http://ww1.sinaimg.cn/large/8b283c03gy1g5x4cpgylvj206w078jt7.jpg",
-				"desc": "把这份甘甜空运到你的舌尖",
-				"key":"美国车厘子",
-				"cat":1,
-				"isSelect":false,
-				"count":4
-			},
-			{
-				"id":3,
-				"name": "3333小黄瓜+小番茄+葡萄切三拼 - 500克",
-				"price": "18.00",
-				"oldPrice": "17.99",
-				"src": "http://ww1.sinaimg.cn/large/8b283c03gy1g5x4cpgu79j206w080mys.jpg",
-				"desc": "营养均衡,小数节课",
-				"key":"黄瓜",
-				"cat":1,
-				"isSelect":false,
-				"count":3
-			},
-			{
-				"id":4,
-				"name": "444西班牙香橙1份 - 约500克",
-				"price": "18.00",
-				"oldPrice": "17.99",
-				"src": "http://ww1.sinaimg.cn/large/8b283c03gy1g5x4cph1tsj206w08040h.jpg",
-				"desc": "汁水四溢,口岸甘甜",
-				"key":"香橙",
-				"cat":1,
-				"isSelect":false,
-				"count":3
-			},
-		]
+		cartlist: [],
+		newBalance:[]
 	
 	},
 	getters:{
@@ -175,12 +79,15 @@ const store = new Vuex.Store({
 				data.forEach(item => {
 					tmp = JSON.parse(JSON.stringify(item))
 					tmp.plan= new Array(0,0,0,0,0,0,0)
+					tmp.range = new Array()
 					state.newBalance.push(tmp)
 				})
 				
 				state.newBalance.forEach(item => {
 					let total = item.count;
-					console.log(item.plan)
+					for(let i =0;i<total+1;i++){
+						item.range.push(i)
+					}
 					while(total > 0){
 						for(let i=0;i<7;i++){
 							if(total == 0){

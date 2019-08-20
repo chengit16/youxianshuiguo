@@ -4,12 +4,12 @@
 			<view class="cu-list menu sm-border margin-bottom-10">
 				<view class="cu-item arrow">
 					<view class="content flex">
-						<text class="color-000" style="margin-left: 20rpx;">选择收货地址</text>
+						<text class="color-000">选择收货地址</text>
 					</view>
 				</view>
 			</view>
 			<view class="balance-list margin-bottom-10">
-				<view class="balance-item flex padding-tb10-lr20 align-center size-28rpx" v-for="(item,index) in classifyData" :key="index">
+				<view class="balance-item flex padding-tb10-lr20 align-center size-28rpx solid-bottom" v-for="(item,index) in classifyData" :key="index">
 					<view class="left margin-right-10">
 						<image :src="item.src" mode=""></image>
 					</view>
@@ -31,17 +31,17 @@
 					</view>
 				</view>
 				<view class="plan-list">
-					<view class="plan-item flex align-center">
+					<view class="plan-item flex align-center solid-bottom">
 						<view class="left flex  align-center">
 							
 						</view>
-						<view class="right flex justify-between">
+						<view class="right flex justify-between plan-date">
 							<view class="blk blk-date" v-for="(pc,index) in planDate" :key="index" :class="{'blk-date-nextweek':pc.nextWeek}">
 								<text>{{pc.nextWeek ? '下周':'周'}}{{pc.weekText}}</text>
 							</view>
 						</view>
 					</view>
-					<view class="plan-item flex align-center sm-border" v-for="(item,index) in classifyData" :key="index">
+					<view class="plan-item flex align-center sm-border solid-bottom" v-for="(item,i) in classifyData" :key="i">
 						<view class="left flex  align-center">
 							<view class="flex flex-direction">
 								<image :src="item.src" mode=""></image>
@@ -51,12 +51,54 @@
 								<text>x {{item.count}}</text>
 							</view>
 						</view>
-						<view class="right flex justify-between">
-							<view class="blk" v-for="(d,index) in item.plan" :key="index">
-								<text>{{d == 0 ? '-':d}}</text>
+						<view class="right flex justify-between" :class="{'error':sum(item.plan,item.count)}">
+							<view class="blk" v-for="(d,i1) in item.plan" :key="i1">
+								<!-- <text>{{d == 0 ? '-':d}}</text> -->
+								<picker @change="bindPickerChange" :data-row="i" :data-col="i1" :data-count="item.count" :value="d" :range="item.range">
+									<text>{{d == 0 ? '-':d}}</text>
+								</picker>
 							</view>
 						</view>
 					</view>
+				</view>
+			</view>
+			<view class="cu-list menu sm-border margin-bottom-10">
+				<view class="cu-item arrow">
+					<view class="content">
+						<text class="color-000">积分抵扣</text>
+					</view>
+					<view class="action">
+						<text class="text-grey text-sm">0积分</text>
+					</view>
+				</view>
+				<view class="cu-item arrow">
+					<view class="content">
+						<text class="color-000">优惠券</text>
+					</view>
+					<view class="action">
+						<text class="text-grey text-sm">-5<text class="text-price"></text></text>
+					</view>
+				</view>
+			</view>
+			<form>
+				<view class="cu-form-group">
+					<view class="title">备注</view>
+					<input placeholder="给我们留言(选填)" name="input"></input>
+				</view>
+			</form>
+			<view class="footer flex justify-between align-center padding-tb10-lr20">
+				<view class="total-price flex align-center">
+						<view class="">
+							<text class="size-28rpx">应付:<text class="text-price color-5ea046"></text><text class="price color-5ea046">122.30</text></text>
+						</view>
+						<text class="margin-left-10">|</text>
+						
+						<view class="margin-left-10 size-24rpx">
+							<text>优惠:<text class="text-price"></text>5.00</text>
+						</view>
+				</view>
+				<view class="submit-btn">
+					<button type="primary" class="lg">提交订单</button>
 				</view>
 			</view>
 		</view>
@@ -65,18 +107,7 @@
 
 <script>
 	import { mapState } from "vuex"
-	function weekText(val){
-		const weeklist = {
-			0:"日",
-			1:"一",
-			2:"二",
-			3:"三",
-			4:"四",
-			5:"五",
-			6:"六"
-		}
-		return weeklist[val]
-	}
+	import { weekText } from "../../common/util.js"
 	export default {
 		data() {
 			return {
@@ -125,30 +156,31 @@
 				})
 				return d
 			}
+			
 		},
 		created() {
 			console.log(this.classifyData)
+		},
+		methods:{
+			sum(arr,count){
+				let sum = 0;
+				arr.forEach(item => sum+=item*1)
+				return sum == count ? false : true
+			},
+			bindPickerChange (e) {
+				let _that = this;
+				let row = e.target.dataset.row
+				let col = e.target.dataset.col
+				let count = e.target.dataset.count
+				this.classifyData[row].plan.splice(col, 1, e.target.value*1)
+				console.log(this.classifyData)
+			},
 		}
 	}
 </script>
 
 <style lang="less">
-	.balance-list{
-		.balance-item{
-			.left{
-				image{
-					width: 100rpx;
-					height: 100rpx;
-				}
-			}
-			.center{
-				margin-right:30rpx;
-			}
-			.right{
-				margin-left: auto;
-			}
-		}
-	}
+
 	.plan-list{
 		.plan-item{
 			.left{
@@ -166,21 +198,42 @@
 			.right{
 				flex:1;
 				padding:0 20rpx;
-				
+				height:120rpx;
+				line-height:120rpx;
+				&.error{
+					.blk{
+						color:red !important;
+					}
+				}
 				.blk{
 					width: 80rpx;
 					color:#9b9b9b;
 					font-size: 20rpx;
 					text-align: center;
+					
 				}
-				.blk-date{
-					color:#000;
+				&.plan-date {
+					height: 60rpx;
+					line-height:60rpx;
+					.blk-date{
+						color:#000;
+					}
+					.blk-date-nextweek{
+						color:#F5A623;
+					}
 				}
-				.blk-date-nextweek{
-					color:#F5A623;
-				}
+				
 			}
 		}
 	}
-
+	.balance{
+		padding-bottom: 120rpx;
+	}
+	.footer{
+		position: fixed;
+		bottom:0;
+		left: 0;
+		width: 100%;
+		height: 120rpx;
+	}
 </style>

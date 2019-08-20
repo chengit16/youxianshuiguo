@@ -28,7 +28,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="cart-ctrl">
+		<view class="cart-ctrl" v-if="classifyData.length > 0">
 			<view class="select-btn" @click="handleSelectAll()">
 				<view class="select-form">
 					<text :class="'cuIcon-round'" v-show="!allSelect" style="color:#dddddd"></text>
@@ -149,7 +149,6 @@
 				uni.navigateTo({
 					url:'/pages/balance/balance'
 				})
-				
 			}
 		},
 		

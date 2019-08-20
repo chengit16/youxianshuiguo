@@ -6,7 +6,7 @@
 				<view class="cu-avatar lg round margin-left" style="background-image:url(http://ww1.sinaimg.cn/large/8b283c03gy1g61nw88qr4j205i05eaas.jpg);"></view>
 				<view class="user-name flex flex-direction">
 					<text class="name">未登录</text>
-					<button type="default" class="cu-btn round line-black" open-type="getUserInfo">登录享会员特权</button>
+					<button type="default" class="cu-btn round line-black" @click="goLogin">登录享会员特权</button>
 				</view>
 			</view>
 		</view>
@@ -39,7 +39,7 @@
 			<view class="demo-title">
 				<view class="flex padding justify-between">
 					<view class="title-name">我的订单</view>
-					<view class="showAll">查看全部订单></view>
+					<view class="showAll" @tap="goOrders">查看全部订单></view>
 				</view>
 				<view class="cu-list grid col-4 no-border" >
 					<view class="cu-item" v-for="(item,index) in menuslist" :key="index">
@@ -108,6 +108,16 @@
 				// 		console.log(res)
 				// 	}
 				// })
+			},
+			goOrders(){
+				uni.navigateTo({
+					url:'/pages/orders/orders?tab=0'
+				})
+			},
+			goLogin(){
+				uni.navigateTo({
+					url:'/pages/login/login'
+				})
 			}
 		},
 		created() {
