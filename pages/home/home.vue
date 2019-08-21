@@ -3,29 +3,30 @@
 		<!-- header -->
 		<view class="header">
 			<view class="hd-search">
-				<view class="cu-bar search bg-white">
-					<view class="cu-avatar round" style="background-image:url(http://ww1.sinaimg.cn/large/8b283c03gy1g64u6t16byj213s0ei4et.jpg)"></view>
-					<view class="search-form round">
+				<view class="cu-bar search bg-white flex align-center">
+					<view class="action">
+						<text class="iconfont icon-location-o margin-right-10 size-38rpx"></text>
+						<text class="size-30rpx color-000">南艺校区</text>
+					</view>
+					<view class="search-form" style="border-radius: 16rpx;">
 						<text class="cuIcon-search"></text>
 						<input @focus="InputFocus" @blur="InputBlur" :adjust-position="false" type="text" placeholder="山竹" confirm-type="search"></input>
-					</view>
-					<view class="action">
-						<text>南艺校区</text>
-						<text class="cuIcon-triangledownfill"></text>
 					</view>
 				</view>
 			</view>
 		</view>
 		<!-- advertising -->
 		<view class="advertising">
-			<view class="cu-card case">
-				<view class="cu-item shadow">
-					<view class="image">
-						<image src="http://ww1.sinaimg.cn/large/8b283c03gy1g64u6t16byj213s0ei4et.jpg"
-						 mode="widthFix"></image>
-					</view>
-				</view>
+			<view class="padding">
+				<swiper class="screen-swiper cu-item square-dot" :indicator-dots="true" :circular="true"
+						 :autoplay="true" interval="3000" duration="500" style="overflow: hidden;">
+					<swiper-item v-for="(item,index) in swiperList" :key="index">
+						<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
+						<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
+					</swiper-item>
+				</swiper>
 			</view>
+			
 			<view>
 				<view class="grid-menus">
 					<view class="menu-item" v-for="(item,index) in gridList" :key="index">
@@ -41,27 +42,31 @@
 				<view class="demo-title">
 					<view class="flex padding justify-between">
 						<view class="title-name">今日特惠</view>
-						<view class="showAll">全部商品></view>
+						<view class="showAll" @click="goCate">全部商品></view>
 					</view>
 				</view>
 				<view class="demo-body">
-					<view class="grid margin-bottom text-center col-4">
-						<view class="adv-group flex" v-for="(item,index) in list" :key="index">
-							<image :src="item.src"></image>
-							<text class="name">{{item.name}}</text>
-							<view class="price-list ">
-								<text class="new  text-price">{{item.price}}</text>
-								<text class="old  text-price">{{item.oldPrice}}</text>
+					<scroll-view :scroll-x="true">
+						<view class="flex margin-bottom text-center">
+							<view class="adv-group flex" v-for="(item,index) in list" :key="index">
+								<image :src="item.src"></image>
+								<text class="name">{{item.name}}</text>
+								<view class="price-list ">
+									<text class="new  text-price">{{item.price}}</text>
+									<text class="old  text-price">{{item.oldPrice}}</text>
+								</view>
 							</view>
 						</view>
-					</view>
+					</scroll-view>
+
+					
 				</view>
 			</view>
 			<view class="demo-module">
 				<view class="demo-title">
 					<view class="flex padding justify-between">
 						<view class="title-name">小食量</view>
-						<view class="showAll">全部商品></view>
+						<view class="showAll" @click="goCateByIndex(1)">全部商品></view>
 					</view>
 				</view>
 				<view class="demo-body">
@@ -99,6 +104,25 @@
 	export default {
 		data() {
 			return {
+				cardCur: 0,
+				swiperList: [{
+					id: 0,
+					type: 'image',
+					url: 'http://ww1.sinaimg.cn/large/8b283c03gy1g64u6t16byj213s0ei4et.jpg'
+				}, {
+					id: 1,
+					type: 'image',
+					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big37006.jpg',
+				}, {
+					id: 2,
+					type: 'image',
+					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big39000.jpg'
+				}, {
+					id: 3,
+					type: 'image',
+					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10001.jpg'
+				}],
+
 				gridList:[
 					{name:"今日特惠",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49pjtemj205k05kwej.jpg")},
 					{name:"小食量",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49pjehnj205k05kglm.jpg")},
@@ -106,6 +130,14 @@
 					{name:"我的积分",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49phfl5j205k05kgln.jpg")}
 				],
 				list:[
+					{name:"幸好有你",price:"18.00",oldPrice:"17.99",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49pip3rj209c09sadm.jpg")},
+					{name:"甜蜜一游",price:"18.00",oldPrice:"17.99",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49pmngqj209c09sq60.jpg")},
+					{name:"阳光玫瑰",price:"18.00",oldPrice:"17.99",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49plpwwj209c09s0vj.jpg")},
+					{name:"清凉套餐",price:"18.00",oldPrice:"17.99",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49pij8uj209c09smzp.jpg")},
+					{name:"幸好有你",price:"18.00",oldPrice:"17.99",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49pip3rj209c09sadm.jpg")},
+					{name:"甜蜜一游",price:"18.00",oldPrice:"17.99",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49pmngqj209c09sq60.jpg")},
+					{name:"阳光玫瑰",price:"18.00",oldPrice:"17.99",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49plpwwj209c09s0vj.jpg")},
+					{name:"清凉套餐",price:"18.00",oldPrice:"17.99",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49pij8uj209c09smzp.jpg")},
 					{name:"幸好有你",price:"18.00",oldPrice:"17.99",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49pip3rj209c09sadm.jpg")},
 					{name:"甜蜜一游",price:"18.00",oldPrice:"17.99",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49pmngqj209c09sq60.jpg")},
 					{name:"阳光玫瑰",price:"18.00",oldPrice:"17.99",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49plpwwj209c09s0vj.jpg")},
@@ -133,10 +165,23 @@
 		},
 		methods:{
 			...mapMutations([
-				"changeGoodCount"
+				"changeGoodCount",
+				"updateActiveCate"
 			]),
 			changeCount(item,t){
 				this.changeGoodCount({item,t})
+			},
+			goCate(){
+				this.updateActiveCate(0)
+				uni.switchTab({
+				    url: '/pages/cate/cate'
+				});
+			},
+			goCateByIndex(index){
+				this.updateActiveCate(index)
+				uni.switchTab({
+				    url: '/pages/cate/cate'
+				});
 			}
 		}
 	}

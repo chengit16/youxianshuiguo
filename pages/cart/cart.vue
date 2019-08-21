@@ -1,7 +1,7 @@
 <template>
 	<page>	
 		<view class="">
-			<view class="good-list" :class="index == classifyData.length-1?'good-block':''">
+			<view class="good-list"  v-if="classifyData.length > 0" :class="index == classifyData.length-1?'good-block':''">
 				<view class="good-item" :id="i==0?'first':''" v-for="(item,i) in classifyData" :key="i">
 					<view class="select-form"  @click="handleSelect(item)">
 						<text :class="'cuIcon-round'" v-show="!item.isSelect" style="color:#dddddd"></text>
@@ -27,6 +27,7 @@
 					</view>
 				</view>
 			</view>
+			<noData v-if="classifyData.length == 0"></noData>
 		</view>
 		<view class="cart-ctrl" v-if="classifyData.length > 0">
 			<view class="select-btn" @click="handleSelectAll()">
@@ -49,9 +50,14 @@
 
 <script>
 	import {mapState,mapMutations} from "vuex"
+	import noData from "../../components/noData/noData.vue"
 	export default {
+		components:{
+			noData
+		},
 		data() {
 			return {
+				isNodata:true,
 				allSelect:false,
 			};
 		},
@@ -80,8 +86,7 @@
 			}
 		},
 		created(){
-			console.log(this.$store.state.cartlist)
-			console.log(this.classifyData)
+			
 		},
 		methods:{
 			...mapMutations([

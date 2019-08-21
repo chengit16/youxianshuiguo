@@ -220,25 +220,49 @@
 	}
 	
 	.line-green{
-		color:#5EA046;
+		color:#5EA046 !important;;
 	}
 	.lines-green{
-		color:#5EA046;
+		color:#5EA046 !important;;
 	}
 	.bg-green{
-		background:#5EA046;
+		background:#5EA046 !important;;
 	}
 	.bg-f6{
-		background:#F6F6F6;
+		background:#F6F6F6 !important;;
 	}
 	.bg-fff{
-		background:#FFFFFF;
+		background:#FFFFFF !important;;
 	}
 	.padding-20{
 		padding:20rpx;
 	}
 	.padding-tb10-lr20{
 		padding:10rpx 20rpx;
+	}
+	.padding-top-10{
+		padding-top: 10rpx;
+	}
+	.padding-top-20{
+		padding-top: 20rpx;
+	}
+	.padding-right-10{
+		padding-right: 10rpx;
+	}
+	.padding-right-20{
+		padding-right: 20rpx;
+	}
+	.padding-bottom-10{
+		padding-bottom: 10rpx;
+	}
+	.padding-bottom-20{
+		padding-bottom: 20rpx;
+	}
+	.padding-left-10{
+		padding-left: 10rpx;
+	}
+	.padding-left-20{
+		padding-left: 20rpx;
 	}
 	//
 	.margin-bottom-10{
@@ -252,5 +276,17 @@
 	}
 	.margin-left-10{
 		margin-left: 10rpx;
+	}
+	.margin-bottom-20{
+		margin-bottom: 20rpx;
+	}
+	.margin-top-20{
+		margin-top: 20rpx;
+	}
+	.margin-right-20{
+		margin-right: 20rpx;
+	}
+	.margin-left-20{
+		margin-left: 20rpx;
 	}
 </style>

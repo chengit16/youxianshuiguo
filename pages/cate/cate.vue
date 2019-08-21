@@ -75,7 +75,8 @@
 		},
 		computed:{
 			...mapState({
-				classifyData : state => state.goodslist
+				classifyData : state => state.goodslist,
+				activeCate : state => state.activeCate
 			})
 		},
 		created(){
@@ -88,8 +89,13 @@
 			this.height = uni.getSystemInfoSync().windowHeight - this.tabBarHeight;
 		},
 		onReady() {
+			let _that = this;
 			this.getHeightList();
-			console.log(this.$store.state.goodslist)
+			
+		},
+		onShow(){
+			let _that = this;
+			this.categoryClickMain(_that.activeCate)
 		},
 		methods: {
 			...mapMutations([

@@ -4,10 +4,10 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
 	state: {
+		activeCate:0,
 		goodslist: [],
 		cartlist: [],
 		newBalance:[]
-	
 	},
 	getters:{
 		cartlistlen(state){
@@ -15,8 +15,12 @@ const store = new Vuex.Store({
 		}
 	},
 	mutations: {
+		// 商品左侧激活index
+		updateActiveCate(state,data) {
+			state.activeCate = data
+		},
 		// 更新商品数据
-		updateGoodslist: function(state, data) {
+		updateGoodslist(state, data) {
 			state.goodslist = [];
 			state.goodslist.push(...data)
 		},

@@ -39,10 +39,10 @@
 			<view class="demo-title">
 				<view class="flex padding justify-between">
 					<view class="title-name">我的订单</view>
-					<view class="showAll" @tap="goOrders">查看全部订单></view>
+					<view class="showAll" @tap="goOrders(0)">查看全部订单></view>
 				</view>
 				<view class="cu-list grid col-4 no-border" >
-					<view class="cu-item" v-for="(item,index) in menuslist" :key="index">
+					<view class="cu-item" v-for="(item,index) in menuslist" :key="index" @click="goOrders(index+1)">
 						<view class="iconfont size-60rpx" :class="'icon-' + item.iconname" style="color: #5EA046;">
 							<view class="cu-tag badge" v-if="item.badge!=0">
 								<block v-if="item.badge!=1">{{item.badge>99?'99+':item.badge}}</block>
@@ -51,7 +51,6 @@
 						<text class="size-24rpx" style="color:#9B9B9B">{{item.name}}</text>
 					</view>
 				</view>
-
 			</view>
 		</view>
 		<view class="user-list">
@@ -109,9 +108,9 @@
 				// 	}
 				// })
 			},
-			goOrders(){
+			goOrders(index){
 				uni.navigateTo({
-					url:'/pages/orders/orders?tab=0'
+					url:`/pages/orders/orders?tab=${index}`
 				})
 			},
 			goLogin(){

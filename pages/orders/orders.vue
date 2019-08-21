@@ -75,7 +75,7 @@ import { testOrders } from '../../common/util.js';
 export default {
 	onLoad(options) {
 		console.log(options.tab);
-		this.tabindex = options.tab;
+		this.TabCur = options.tab;
 	},
 	data() {
 		return {
@@ -87,7 +87,6 @@ export default {
 	methods: {
 		tabSelect(e) {
 			this.TabCur = e.currentTarget.dataset.id;
-			console.log(testOrders);
 		},
 		goDetail(){
 			uni.navigateTo({
