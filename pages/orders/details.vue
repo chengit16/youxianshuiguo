@@ -43,7 +43,7 @@
 					<text><text class="text-price"></text>5.30</text>
 				</view>
 				<view class="total-price solid-bottom flex justify-between align-center margin-bottom-10 padding">
-					<button class="cu-btn line color-000">
+					<button class="cu-btn line color-000" open-type="contact">
 						<text class="iconfont icon-service-o"></text>联系客服
 					</button>
 					<text>

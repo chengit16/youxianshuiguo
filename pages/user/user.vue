@@ -62,11 +62,12 @@
 			</view>
 			<view class="cu-list menu sm-border">
 				<view class="cu-item arrow" v-for="(item,index) in userPagelist" :key="index">
-					<view class="content flex">
+					<view class="content flex justify-start align-center">
 						<text class="iconfont size-50rpx color-000" :class="'icon-'+item.iconname">
 							
 						</text>
-						<text class="color-000" style="margin-left: 20rpx;">{{item.name}}</text>
+						<text class="color-000" style="margin-left: 20rpx;" v-if="item.type=='text'">{{item.name}}</text>
+						<button class="contact-btn color-000" open-type="contact" v-if="item.type == 'button'">{{item.name}}</button>
 					</view>
 				</view>
 			</view>
@@ -85,10 +86,10 @@
 					{name:"退款中",iconname:"refund",badge:10},
 				],
 				userPagelist:[
-					{name:"收货地址",iconname:"location-o"},
-					{name:"我的优惠券",iconname:"coupon-o"},
-					{name:"我的积分",iconname:"points"},
-					{name:"联系客服",iconname:"service-o"},
+					{name:"收货地址",iconname:"location-o",type:'text'},
+					{name:"我的优惠券",iconname:"coupon-o",type:'text'},
+					{name:"我的积分",iconname:"points",type:'text'},
+					{name:"联系客服",iconname:"service-o",type:'button'},
 				],
 				userinfo:{}
 			};
@@ -164,11 +165,17 @@
 		}
 	}
 }
-// .user-infoitem{
-// 	.title{
-// 		font-size:20rpx;
-// 		color:#9B9B9B;
-// 	}
-// }
+.contact-btn{
+	margin: 0;
+	padding:0;
+	margin-left: 20rpx;
+	width: 100%;;
+	background:#fff;
+	font-size:30rpx;
+	text-align:left;
+	&::after{
+		display: none;
+	}
+}
 
 </style>
