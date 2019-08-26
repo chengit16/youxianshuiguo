@@ -165,6 +165,11 @@
 					title: text,
 					icon: "none",
 				})
+			},
+			InputFocus(){
+				uni.navigateTo({
+				    url: '/pages/search/search'
+				});
 			}
 		},
 		components: {

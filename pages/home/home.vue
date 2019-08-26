@@ -182,6 +182,11 @@
 				uni.switchTab({
 				    url: '/pages/cate/cate'
 				});
+			},
+			InputFocus(){
+				uni.navigateTo({
+				    url: '/pages/search/search'
+				});
 			}
 		}
 	}
