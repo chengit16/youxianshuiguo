@@ -30,7 +30,9 @@
 			<view>
 				<view class="grid-menus">
 					<view class="menu-item" v-for="(item,index) in gridList" :key="index">
-						<image :src="item.src" mode=""></image>
+						<view class="menu-icon" :style="{background:item.bg}">
+							<icon class="iconfont" :class="'icon-'+item.classname"></icon>
+						</view>
 						<text>{{item.name}}</text>
 					</view>
 				</view>
@@ -48,12 +50,12 @@
 				<view class="demo-body">
 					<scroll-view :scroll-x="true">
 						<view class="flex margin-bottom text-center">
-							<view class="adv-group flex" v-for="(item,index) in list" :key="index">
-								<image :src="item.src"></image>
-								<text class="name">{{item.name}}</text>
+							<view class="adv-group flex" v-for="(item,index) in todaysell.list" :key="index">
+								<image :src="item.img"></image>
+								<text class="name  text-ellipsis">{{item.name}}</text>
 								<view class="price-list ">
-									<text class="new  text-price">{{item.price}}</text>
-									<text class="old  text-price">{{item.oldPrice}}</text>
+									<text class="new  text-price">{{filter.money(item.price)}}</text>
+									<text class="old  text-price" v-if="item.market">{{item.market}}</text>
 								</view>
 							</view>
 						</view>
@@ -66,27 +68,27 @@
 				<view class="demo-title">
 					<view class="flex padding justify-between">
 						<view class="title-name">小食量</view>
-						<view class="showAll" @click="goCateByIndex(1)">全部商品></view>
+						<view class="showAll" @click="goCateByIndex(smalleat.index)">全部商品></view>
 					</view>
 				</view>
 				<view class="demo-body">
 					<!-- 商品列表 -->
-					<view class="good-list"  v-for="(foods,index) in goodlist" :key="index">
-						<view class="good-item" v-for="(item,i) in foods.foods" :key="i">
+					<view class="good-list cu-list menu sm-border" :key="index">
+						<view class="good-item cu-item" v-for="(item,i) in smalleat.list" :key="i">
 							<view class="good-item-left">
-								<image :src="item.src" mode=""></image>
+								<image :src="item.img" mode=""></image>
 							</view>
 							<view class="good-item-right">
-								<text class="name">{{item.name}}</text>
+								<text class="name  text-ellipsis">{{item.name}}</text>
 								<text class="desc text-ellipsis">{{item.desc}}</text>
 								<view class="ctrl-module">
 									<view class="price-list ">
-										<text class="new text-price">{{item.price}}</text>
-										<text class="old text-price">{{item.oldPrice}}</text>
+										<text class="new text-price">{{filter.money(item.price)}}</text>
+										<!-- <text class="old text-price">{{item.oldPrice}}</text> -->
 									</view>
 									<view class="ctrl-btns">
-										<button class="cu-btn line-green round sm" v-show="item.count>0" @click="changeCount(item,false)">-</button>
-										<text  v-show="item.count>0">{{item.count}}</text>
+										<button class="cu-btn line-green round sm" v-show="item.num>0" @click="changeCount(item,false)">-</button>
+										<text  v-show="item.num>0">{{item.num}}</text>
 										<button class="cu-btn bg-green round sm " @click="changeCount(item,true)">+</button>
 									</view>
 								</view>
@@ -101,33 +103,18 @@
 
 <script>
 	import {mapState,mapMutations} from "vuex"
+	// import filter from "../../common/filter.js"
 	export default {
 		data() {
 			return {
 				cardCur: 0,
-				swiperList: [{
-					id: 0,
-					type: 'image',
-					url: 'http://ww1.sinaimg.cn/large/8b283c03gy1g64u6t16byj213s0ei4et.jpg'
-				}, {
-					id: 1,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big37006.jpg',
-				}, {
-					id: 2,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big39000.jpg'
-				}, {
-					id: 3,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10001.jpg'
-				}],
-
+				swiperList: [],
+				// filter:filter,
 				gridList:[
-					{name:"今日特惠",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49pjtemj205k05kwej.jpg")},
-					{name:"小食量",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49pjehnj205k05kglm.jpg")},
-					{name:"每日签到",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49phi81j205k05k3yi.jpg")},
-					{name:"我的积分",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49phfl5j205k05kgln.jpg")}
+					{name:"今日特惠",classname:"discount",bg:"#c2e691"},
+					{name:"小食量",classname:"like-o",bg:"#c12827"},
+					{name:"每日签到",classname:"certificate",bg:"#eba844"},
+					{name:"我的积分",classname:"points",bg:"#5891dc"}
 				],
 				list:[
 					{name:"幸好有你",price:"18.00",oldPrice:"17.99",src:("http://ww1.sinaimg.cn/large/8b283c03gy1g5x49pip3rj209c09sadm.jpg")},
@@ -153,20 +140,52 @@
 		},
 		computed:{
 			...mapState({
-				goodlist:(state) => {
-					let arr = [];
-					arr.push(state.goodslist[0])
-					return arr
+				goodslist:state => state.goodslist,
+				todaysell : state => {
+					let obj = {
+						index:0,
+						list : []
+					}
+					
+					state.goodslist.forEach((classify,index) => {
+						if(classify.code == "offer"){
+							obj.index = index;
+							obj.list = [];
+							obj.list.push(...classify.product)
+						}
+					})
+					
+					return obj
+				},
+				smalleat : state => {
+					let obj = {
+						index:0,
+						list : []
+					}
+					
+					state.goodslist.forEach((classify,index) => {
+						if(classify.code == "mini"){
+							obj.index = index;
+							obj.list = [];
+							obj.list.push(...classify.product)
+						}
+					})
+					
+					return obj
 				}
 			})
 		},
 		created(){
-			console.log(this.goodlist)
+			let _t = this;
+			this.getBanner();
+			this.updateGoodslist()
 		},
 		methods:{
+			
 			...mapMutations([
 				"changeGoodCount",
-				"updateActiveCate"
+				"updateActiveCate",
+				"updateGoodslist"
 			]),
 			changeCount(item,t){
 				this.changeGoodCount({item,t})
@@ -187,6 +206,33 @@
 				uni.navigateTo({
 				    url: '/pages/search/search'
 				});
+			},
+			getBanner(){
+				let _t = this
+				/// --- 接口无数据 --- ///
+				_t.$http.get({url: '/mini/res/banner/'}, function(res) {
+				      if (res.code == 0) {
+				        _t.swiperList = []
+						// _t.swiperList.push(...res.data)
+						_t.swiperList.push(...[{
+							id: 0,
+							type: 'image',
+							url: 'http://ww1.sinaimg.cn/large/8b283c03gy1g64u6t16byj213s0ei4et.jpg'
+						}, {
+							id: 1,
+							type: 'image',
+							url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big37006.jpg',
+						}, {
+							id: 2,
+							type: 'image',
+							url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big39000.jpg'
+						}, {
+							id: 3,
+							type: 'image',
+							url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10001.jpg'
+						}])
+				      }
+				})
 			}
 		}
 	}
@@ -202,10 +248,17 @@
 			flex-direction: column;
 			align-items: center;
 			padding:20rpx;
-			image{
+			.menu-icon{
 				width: 100rpx;
 				height: 100rpx;
 				border-radius: 50%;
+				text-align: center;
+				background: red;
+				line-height: 100rpx;
+				icon{
+					color:#fff;
+					font-size: 70rpx;
+				}
 			}
 			text{
 				margin-top:10rpx;

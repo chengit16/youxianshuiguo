@@ -1,35 +1,65 @@
 <template>
 	<page>	
 		<view class="">
-			<view class="good-list"  v-if="classifyData.length > 0" :class="index == classifyData.length-1?'good-block':''">
-				<view class="good-item" :id="i==0?'first':''" v-for="(item,i) in classifyData" :key="i">
+			<view class="good-list cu-list menu"  v-if="enablelist.length > 0" :class="index == enablelist.length-1?'good-block':''">
+				<view class="good-item cu-item" :class="modalName=='move-box-'+ i?'move-cur':''"
+				 @touchstart="ListTouchStart" @touchmove="ListTouchMove" @touchend="ListTouchEnd" :data-target="'move-box-' + i"
+				 :id="i==0?'first':''" v-for="(item,i) in enablelist" :key="i">
 					<view class="select-form"  @click="handleSelect(item)">
 						<text :class="'cuIcon-round'" v-show="!item.isSelect" style="color:#dddddd"></text>
 						<text :class="'cuIcon-roundcheckfill'" v-show="item.isSelect" style="color:#52b537"></text>
 					</view>
 					<view class="good-item-left">
-						<image :src="item.src" mode=""></image>
+						<image :src="item.product.thumb" mode=""></image>
 					</view>
 					<view class="good-item-right">
-						<text class="name">{{item.name}}</text>
-						<text class="desc text-ellipsis">{{item.desc}}</text>
+						<text class="name">{{item.product.name}}</text>
+						<text class="desc text-ellipsis">{{item.product.desc}}</text>
 						<view class="ctrl-module">
 							<view class="price-list ">
-								<text class="new text-price">{{item.price}}</text>
-								<text class="old text-price">{{item.oldPrice}}</text>
+								<text class="new text-price">{{filter.money(item.price)}}</text>
+								<!-- <text class="old text-price">{{item.oldPrice}}</text> -->
 							</view>
 							<view class="ctrl-btns">
-								<button class="cu-btn line-green round sm" v-show="item.count>0" @click.stop="changeCount(item,false)">-</button>
-								<text  v-show="item.count>0">{{item.count}}</text>
-								<button class="cu-btn bg-green round sm " @click.stop="changeCount(item,true)">+</button>
+								<button class="cu-btn line-green round sm" v-show="item.num>0" @click.stop="changeCount(item.product,false)">-</button>
+								<text  v-show="item.num>0">{{item.num}}</text>
+								<button class="cu-btn bg-green round sm " @click.stop="changeCount(item.product,true)">+</button>
 							</view>
 						</view>
 					</view>
+					<view class="move" @tap="delProduct(item)">
+						<view class="bg-red">删除</view>
+					</view>
 				</view>
 			</view>
-			<noData v-if="classifyData.length == 0"></noData>
+			<view class="padding-20 text-center" v-if="disablelist.length > 0">
+				以下物品已失效,点击<button  class="cu-btn line-gray round sm">一键删除</button>
+			</view>
+			<view class="good-list cu-list menu"  v-if="disablelist.length > 0" :class="index == disablelist.length-1?'good-block':''">
+				<view class="good-item cu-item" :class="modalName=='move-box-'+ i?'move-cur':''"
+				 @touchstart="ListTouchStart" @touchmove="ListTouchMove" @touchend="ListTouchEnd" :data-target="'move-box-' + i"
+				 :id="i==0?'first':''" v-for="(item,i) in disablelist" :key="i">
+					<view class="good-item-left">
+						<image :src="item.product.thumb" mode=""></image>
+					</view>
+					<view class="good-item-right">
+						<text class="name">{{item.product.name}}</text>
+						<text class="desc text-ellipsis">{{item.product.desc}}</text>
+						<view class="ctrl-module">
+							<view class="price-list ">
+								<text class="new text-price">{{filter.money(item.price)}}</text>
+								<!-- <text class="old text-price">{{item.oldPrice}}</text> -->
+							</view>
+						</view>
+					</view>
+					<view class="move" @tap="delProduct(item)">
+						<view class="bg-red">删除</view>
+					</view>
+				</view>
+			</view>
+			<noData v-if="enablelist.length == 0 && disablelist.length == 0"></noData>
 		</view>
-		<view class="cart-ctrl" v-if="classifyData.length > 0">
+		<view class="cart-ctrl" v-if="enablelist.length > 0">
 			<view class="select-btn" @click="handleSelectAll()">
 				<view class="select-form">
 					<text :class="'cuIcon-round'" v-show="!allSelect" style="color:#dddddd"></text>
@@ -38,8 +68,8 @@
 				<text class="select-all">全选</text>
 			</view>
 			<view class="cart-total">
-				<text class="text-total">合计:<text class="total-val text-price">{{totalPrice}}</text></text>
-				<text class="text-discount">已优惠:$<text  class="discount-val">36.0</text>(免运费)</text>
+				<text class="text-total">合计:<text class="total-val text-price">{{filter.money(totalPrice)}}</text></text>
+				<text class="text-discount">已优惠:<text  class="discount-val text-price">0</text>(免运费)</text>
 			</view>
 			<view class="cart-submit">
 				<button type="primary" size="mini" @click="goBalance" :disabled="canGo">去结算</button>
@@ -58,26 +88,31 @@
 		data() {
 			return {
 				isNodata:true,
-				allSelect:false,
+				allSelect:true,
+				modalName: null,
+				listTouchStart: 0,
+				listTouchDirection: null,
+				selectList:[]
 			};
 		},
 		computed:{
 			...mapState({
-				classifyData: state => state.cartlist
+				enablelist : state => state.cartlist.enable,
+				disablelist : state => state.cartlist.disable,
+				cartSelectList : state => state.cartSelectList
 			}),
 			totalPrice(){
 				let total = 0;
-				this.classifyData.forEach(item => {
+				this.enablelist.forEach(item => {
 					if(item.isSelect){
-						total += item.price * 1000 * item.count
+						total += item.price * 1000 * item.num
 					}
 				})
-				
 				return total / 1000
 			},
 			canGo(){
 				let flag = true;
-				this.classifyData.forEach(item => {
+				this.enablelist.forEach(item => {
 					if(item.isSelect){
 						flag = false
 					}
@@ -91,18 +126,46 @@
 		methods:{
 			...mapMutations([
 				"changeGoodCount",
-				"createNewBalance"
+				"createNewBalance",
+				"delFromCart",
+				"setCartSelect",
+				"delCartSelect"
 			]),
+			showModal(e) {
+				this.modalName = e.currentTarget.dataset.target
+			},
+			hideModal(e) {
+				this.modalName = null
+			},
+			// ListTouch触摸开始
+			ListTouchStart(e) {
+				this.listTouchStart = e.touches[0].pageX
+			},
+			
+			// ListTouch计算方向
+			ListTouchMove(e) {
+				this.listTouchDirection = e.touches[0].pageX - this.listTouchStart > 0 ? 'right' : 'left'
+			},
+			
+			// ListTouch计算滚动
+			ListTouchEnd(e) {
+				if (this.listTouchDirection == 'left') {
+					this.modalName = e.currentTarget.dataset.target
+				} else {
+					this.modalName = null
+				}
+				this.listTouchDirection = null
+			},
 			changeCount(item,t){
-				const _that = this
-				if(!t && item.count == 1){
+				const _t = this
+				if(!t && item.num == 1){
 					uni.showModal({
 					    title: '删除商品',
 					    content: '您确定要删除商品吗?',
 					    success: function (res) {
 					        if (res.confirm) {
-					            _that.changeGoodCount({item,t})
-								_that.changeAllSelect()
+					            _t.changeGoodCount({item,t})
+								_t.changeAllSelect()
 								
 					        } else if (res.cancel) {
 					            console.log('用户点击取消');
@@ -110,46 +173,64 @@
 					    }
 					});
 				}else{
-					_that.changeGoodCount({item,t})
+					_t.changeGoodCount({item,t})
 				}
 			},
+			// 删除商品
+			delProduct(item){
+				this.delFromCart({id:item.pid})
+			},
 			changeAllSelect(){
-				let _that = this;
+				let _t = this;
 				let flag = true;
-				_that.classifyData.length && _that.classifyData.forEach(item => {
+				_t.enablelist.length && _t.enablelist.forEach(item => {
 					if(!item.isSelect){
 						flag = false
 						return
 					}
 				})
-				_that.allSelect = flag ? true : false
+				_t.allSelect = flag ? true : false
+				
+				
 			},
 			handleSelect(item){
-				let _that = this;
+				let _t = this;
 				item.isSelect = !item.isSelect;
-				_that.changeAllSelect()
+				if(!item.isSelect){
+					_t.setCartSelect(item)
+				}else{
+					_t.delCartSelect(item)
+				}
+				_t.changeAllSelect()
 			},
 			handleSelectAll(){
-				let _that = this;
+				let _t = this;
 				//  默认全选
 				let flag = true;
 
-				_that.classifyData.forEach(item => {
-					item.isSelect = !_that.allSelect  ? true : false
+				_t.enablelist.forEach(item => {
+					item.isSelect = !_t.allSelect  ? true : false
 				})
-				_that.allSelect = !_that.allSelect
+				_t.allSelect = !_t.allSelect
+				_t.enablelist.forEach(item => {
+					if(_t.allSelect){
+						_t.delCartSelect(item)
+					}else{
+						_t.setCartSelect(item)
+					}
+				})
 			},
 			// 创建结算单
 			goBalance(){
-				let _that = this;
+				let _t = this;
 				let balance = [];
-				_that.classifyData.forEach(item => {
+				_t.enablelist.forEach(item => {
 					if(item.isSelect){
 						balance.push(item)
 					}
 				})
 
-				_that.createNewBalance(balance)
+				_t.createNewBalance(balance)
 				// 跳转
 				uni.navigateTo({
 					url:'/pages/balance/balance'

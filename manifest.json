@@ -55,7 +55,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wx5d31eac4662c59be",
+        "appid" : "wx31d9824625d94d9e",
         "setting" : {
             "urlCheck" : false,
             "es6" : true
@@ -74,6 +74,19 @@
     "h5" : {
         "router" : {
             "mode" : "hash"
+        },
+        "devServer" : {
+            "disableHostCheck" : true,
+            "proxy" : {
+                "/mini" : {
+                    "target" : "https://fruit.goio.xyz",
+                    "changeOrigin" : true,
+                    "secure" : false,
+                    "pathRewrite" : {
+                        "^/mini" : ""
+                    }
+                }
+            }
         }
     }
 }

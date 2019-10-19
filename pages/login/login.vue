@@ -5,6 +5,7 @@
 		</view>
 		<view class="login-btns padding">
 			<button type="primary" class="wechat" open-type="getUserInfo" @getuserinfo="getUser">微信一键登录</button>
+			<!-- <button type="primary" class="wechat"  @tap="handleLogin">微信一键登录</button> -->
 			<button type="default" class="phone" open-type="getPhoneNumber" @getphonenumber="getPhone">手机号登录</button>
 		</view>
 		<view class="protocol">
@@ -14,6 +15,7 @@
 </template>
 
 <script>
+	import { mapMutations } from "vuex"
 	export default {
 		data() {
 			return {
@@ -21,14 +23,36 @@
 			};
 		},
 		methods:{
+			...mapMutations([
+				"setCode",
+				"setToken",
+				"setLogined",
+				"setUser"
+			]),
 			getUser(res){
 				console.log(res)
+				let _t = this;
+				if(res.detail.userInfo){
+					_t.setUser(res.detail.userInfo);
+					_t.$http.post({url:"/mini/user/save-profile",data:res.detail.userInfo},()=>{})
+					_t.setLogined(true)
+					uni.navigateBack();
+				}else{
+					uni.showToast({
+						title:"您拒绝了授权,无法正常登录"
+					})
+				}
 			},
 			getPhone(res){
 				console.log(res)
+			},
+			handleLogin(res){
+				let _t = this;
+				
 			}
 		},
 		created(){
+
 		}
 	}
 </script>

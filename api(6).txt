@@ -1,0 +1,144 @@
+版本：20190926
+
+服务地址：https://fruit.goio.xyz
+请求：POST，GET都支持，建议POST请求，body数据为json数据，鉴权的地方需要头信息中需要Authorization头
+
+数据格式：JSON{"code":0,"msg":"","data":}
+
+示例1：用户登录
+请求：curl -d '{"code":"001oYFCX1LlfMZ0tp0CX1XmUCX1oYFCn"}' https://fruit.goio.xyz/mini/user/login/
+正确返回：{"code":0,"msg":"","data":{"token":"32328e3a04d5405e8f6c9ac08260891c"}}
+错误返回：{"code":404002,"msg":"系统忙，请稍后再试"}
+
+示例2：用户信息
+请求：curl -H '{Authorization:"Bearer 32328e3a04d5405e8f6c9ac08260891c"}' https://fruit.goio.xyz/mini/user/login/
+正确返回：{"code":0,"msg":"用户信息","data":{"id":"1","phone":"199****9201","name":null,"nick":"Fred","avatar":"https:\/\/wx.qlogo.cn\/mmopen\/vi_32\/ajNVdqHZLLAZWVUBCWGeicF5n98yHCeh2tC8TdKSibdwBwU0CGtFWlw2bC64agZga6rXQFJyDDSkb8DpkOx0eGmg\/132","point":"200"}}
+错误返回：{"code":401,"msg":"error token"}
+
+
+>>>>>>>>>>>>>>>>>>> 接口如下 <<<<<<<<<<<<<<<<<<<<
+
+1. 用户登录
+URI: /mini/user/login/
+参数: {"code":"001oYFCX1LlfMZ0tp0CX1XmUCX1oYFCn"}
+响应: {"code":0,"msg":"","data":{"token":"32328e3a04d5405e8f6c9ac08260891c"}}
+
+2. 用户信息
+URI: /mini/user/info/
+参数: 无
+响应: {"code":0,"msg":"用户信息","data":{"id":"1","phone":"199****9201","name":null,"nick":"Fred","avatar":"https:\/\/wx.qlogo.cn\/mmopen\/vi_32\/ajNVdqHZLLAZWVUBCWGeicF5n98yHCeh2tC8TdKSibdwBwU0CGtFWlw2bC64agZga6rXQFJyDDSkb8DpkOx0eGmg\/132","point":"200"}}
+
+3. 保存用户信息
+URI: /mini/user/save-profile/
+参数: {"avatarUrl":"https://wx.qlogo.cn/mmopen/vi_32/ajNVdqHZLLAZWVUBCWGeicF5n98yHCeh2tC8TdKSibdwBwU0CGtFWlw2bC64agZga6rXQFJyDDSkb8DpkOx0eGmg/132","province":"江苏","city":"南京","nickName":"Fred","gender":1}
+响应: {"code":0,"msg":"保存成功"}
+
+4. 轮播图信息
+URI: /mini/res/banner/
+参数: 无
+响应: {"code":0,"msg":"","data":[{"id":"1","name":"开学季","url":"","img":"http:\/\/wx.labell.vip\/static\/upload\/banner\/3a4ed2467b5241fa836c91fbc7a27974.png"},{"id":"2","name":"好心情","url":"","img":"http:\/\/wx.labell.vip\/static\/upload\/banner\/4e3adf8aedae494d8c581de00a870b47.jpg"}]}
+
+5. 今日特惠
+如“商品列表” code: "offer"
+
+6. 小食量
+如“商品列表” code: "mini"
+
+7. 热门搜索
+URI: /mini/search/hot/
+参数: 无
+响应: {"code":0,"msg":"热搜列表","data":["山竹","芒果"]}
+
+8. 搜索
+URI: /mini/search/
+参数: {"keyword":"永恒"}
+响应: {"code":0,"msg":"搜索结果","data":[{"id":"1","name":"永恒之恋","thumb":"http:\/\/wx.labell.vip\/static\/upload\/prod\/b69728f2c63948c7ae98d58226606e4a.jpg","price":"19900","market":"39000"}]}
+
+9. 商品列表
+URI: /mini/cate/
+参数: 无
+响应: {"code":0,"msg":"","data":[{"id":"1","code":"mini","title":"小食量","product":[{"unid":"1-1","id":"1","img":"http:\/\/127.0.0.1:2037\/static\/upload\/prod\/1.jpg","name":"产品","desc":"产品介绍"}]},{"id":"2","code":null,"title":"新品上市","product":[{"unid":"2-1","id":"1","img":"http:\/\/127.0.0.1:2037\/static\/upload\/prod\/1.jpg","name":"产品","desc":"产品介绍"}]},{"id":"3","code":null,"title":"精选水果","product":[]},{"id":"4","code":null,"title":"店长推荐","product":[]},{"id":"5","code":null,"title":"轻食果切","product":[]},{"id":"6","code":null,"title":"漂洋过海","product":[]},{"id":"7","code":null,"title":"国产精品","product":[]},{"id":"8","code":null,"title":"特色饮品","product":[]},{"id":"9","code":null,"title":"休闲食品","product":[]},{"id":"10","code":"offer","title":"今日特惠","product":[]}]}
+
+10. 添加到购物车
+URI: /mini/cart/add/
+参数: {"id":"1","num":1,"price":19900}
+响应: {"code":0,"msg":"","data":1}
+
+# 购物车数量增加
+URI: /mini/cart/plus/
+参数: {"id":"1","num":1}
+响应: {"code":0,"msg":"","data":1}
+
+# 购物车数量减少
+URI: /mini/cart/minus/
+参数: {"id":"1","num":1}
+响应: {"code":0,"msg":"","data":1}
+
+# 购物车数量删除
+URI: /mini/cart/del/
+参数: {"id":"1"}
+响应: {"code":0,"msg":""}
+
+11. 购物车列表
+URI: /mini/cart/
+参数: 无
+响应: {"code":0,"msg":"","data":{"enable":[{"id":"4","pid":"1","product":{"name":"永恒之恋","unit":"个","market":"39000","thumb":""},"price":"19900","cart_price":"19900","num":1,"store":1}],"disable":[]}}
+
+12. 购物车数量
+URI: /mini/cart/num/
+参数: 无
+响应: {"code":0,"msg":"","data":1}
+
+13. 我的优惠券
+URI: /mini/coupon/
+参数: 无
+响应: {"code":0,"msg":"","data":[{"serial":"12","money":1000,"amount":5000,"received":"2019-09-19 00:00:00","expired":"2019-09-18 00:00:00","flag":false},{"serial":"2131231","money":1000,"amount":5000,"received":"2019-09-20 00:00:00","expired":"2019-09-27 00:00:00","flag":true}]}
+
+14. 下订单
+URI: /mini/order/pay/
+参数: 
+{"list":[{"id":"4","pid":"1","num":1,"cid":"4","product":{"name":"永恒之恋","unit":"个","market":"39000","thumb":""}}],"addr":{"name":"John Doe","phone":"020-81167888","region":"510000","province":"Guangdong Sheng","city":"Guangzhou Shi","county":"Haizhu Qu","addr":"397 Xingang Middle Rd, KeCun"},"formId":"the formId is a mock one","remark":"good","point": 100,"coupon":"VSK221"}
+响应: {"code":0,"msg":"支付申请提交成功","data":{"appId":"wx60b7d5fbb6748d94","timeStamp":"1568875092","nonceStr":"lwBhkCoDckjAkLp1","package":"prepay_id=wx19143812149521cd7b6b12cf1072808900","signType":"MD5","paySign":"FAE20D433B9BF54F39182374A90FF5C8","sn":"P190919143811898"}}
+
+15. 我的订单
+URI: /mini/order/
+参数: {"type":"all"}
+响应: {"code":0,"msg":"订单列表","data":[{"id":"4","sn":"P190812160646588","amount":"20700","status":"4","detail":[{"name":"永恒之恋","num":"1","price":"19900","spec":"14#","thumb":""}]},{"id":"3","sn":"P190319150942549","amount":"1","status":"5","detail":[{"name":"永恒之恋","num":"1","price":"19900","spec":["默认"],"thumb":"http:\/\/wx.labell.vip\/static\/upload\/prod\/6b4c1ad603d542f8af6b8d71063e9fb9.jpg"}]},{"id":"1","sn":"P190319145205730","amount":"1","status":"2","detail":[{"name":"永恒之恋","num":"1","price":"19900","spec":"默认","thumb":"http:\/\/wx.labell.vip\/static\/upload\/prod\/6b4c1ad603d542f8af6b8d71063e9fb9.jpg"}]}]}
+说明: type, all全部 prepay待付款 send待发货 receive 待收货 all退款中
+
+16. 订单详情
+URI: /mini/order/detail/
+参数: {"sn":"P190319150942549"}
+响应: {"code":0,"msg":"订单详情","data":{"id":"6","sn":"P190919071934221","money":{"product":"500","amount":"0","offer":{"point":"5000","coupon":{"serial":"VSK221","money":1000}}},"addr":{"name":"John Doe","phone":"020-81167888","addr":"Guangdong ShengGuangzhou ShiHaizhu Qu397 Xingang Middle Rd, KeCun"},"status":"1","detail":[{"id":"3","pid":"1","name":"产品","num":"1","price":"500","thumb":""}],"created":"2019-09-19 15:19:34"}}
+
+17. 我的积分
+URI: /mini/user/point/
+参数: 无
+响应: {"code":0,"msg":"积分列表","data":{"amount":"200","list":[{"point":"100","cate":"购物获得","time":"2019-03-19 15:30:42"},{"point":"100","cate":"购物获得","time":"2019-03-19 15:15:24"}]}}
+
+18. 我的地址
+URI: /mini/user/addr/
+参数: 无
+响应: {"code":0,"msg":"地址列表","data":[{"id":"2","name":"test","phone":"19951659201","region":"320113","province":"江苏省","city":"南京市","county":"栖霞区","addr":"双柳河路与环洲路交叉口西50米七里邨农家乐","isDefault":"1"}]}
+
+19. 地址详情
+URI: /mini/user/addr/
+参数: {"id":2}
+响应: {"code":0,"msg":"地址列表","data":{"id":"2","name":"test","phone":"19951659201","region":"320113","province":"江苏省","city":"南京市","county":"栖霞区","addr":"双柳河路与环洲路交叉口西50米七里邨农家乐","isDefault":"1"}}
+
+20. 地址保存
+URI: /mini/user/addr-save/
+参数: {"id":"2","name":"test","phone":"19951659201","region":"320113","province":"江苏省","city":"南京市","county":"栖霞区","addr":"双柳河路与环洲路交叉口西50米七里邨农家乐","isDefault":"1"}
+响应: {"code":0,"msg":"保存成功"}
+
+21. 地址删除
+URI: /mini/user/addr-del/
+参数: {"id":"2"}
+响应: {"code":0,"msg":"删除成功"}
+
+22. 角标显示订单数量
+URI: /mini/order/summary/
+参数: 无
+响应: {"code":0,"msg":"订单数量","data":{"prepay":1,"send":0,"receive":0,"refund":0}}
+
+

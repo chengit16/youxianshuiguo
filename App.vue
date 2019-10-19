@@ -11,20 +11,65 @@
 			console.log('App Launch')
 			
 		},
-		onShow: function() {
-			console.log('App Show')
-			console.log(this.l)
-		},
+		// onShow: function() {
+		// 	console.log('App Show')
+		// },
 		onHide: function() {
-			console.log('App Hide')
+			uni.removeStorageSync('token');
 		},
 		methods:{
 			...mapMutations([
-				'updateGoodslist'
+				'updateGoodslist',
+				"setLogined",
+				"setToken",
+				"getUser"
 			])
 		},
-		created(){
-			this.updateGoodslist(classifyData)
+		onShow(){
+			let _that = this;
+			
+			// 获取本地token 
+			//  没有调用wxlogin
+			
+			try {
+			    const token = uni.getStorageSync('token');
+				console.log(token)
+			    if (token) {
+					_that.setToken(token)
+					_that.getUser()
+					_that.updateGoodslist()
+			    }else{
+					wx.login({
+						success(res) {
+							console.log(res)
+							_that.$http.post({
+								url:"/mini/user/login/",
+								data:{
+									code:res.code
+								}
+							},(resp) => {
+								//登录成功
+								if(resp.code == 0){
+									uni.setStorageSync('token', resp.data.token);
+									_that.updateGoodslist()
+									_that.getUser()
+								}else{
+									wx.showToast({icon: 'none', title: '服务器忙，请稍后再试'})
+								}
+							})
+						},
+						fail() {
+							wx.showToast({icon: 'none', title: '服务器忙，请稍后再试'})
+						}
+					})
+				}
+				
+				
+			} catch (e) {
+			    // error
+				console.log(e)
+			}
+			
 		},
 		watch:{
 			l(val,val1){
@@ -57,6 +102,7 @@
 	view{
 		background-color: #FFFFFF;
 	}
+	
 	.good-list{
 		display: flex;
 		flex-direction: column;
@@ -72,7 +118,10 @@
 		.good-item{
 			display:flex;
 			width:100%;
-			padding:20rpx;
+			padding:20rpx !important;
+			// .move{
+			// 	width:260rpx;
+			// }
 			.good-item-left{
 				margin-right: 50rpx;
 				image{

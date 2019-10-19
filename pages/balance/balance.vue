@@ -2,24 +2,31 @@
 	<page>
 		<view class="balance bg-f6">
 			<view class="cu-list menu sm-border margin-bottom-10">
-				<view class="cu-item arrow">
-					<view class="content flex">
+				<view class="cu-item arrow" @tap="getAddress">
+					<view class="content flex" >
 						<text class="color-000">选择收货地址</text>
+					</view>
+					<view class="action">
+						<view class="name-tel" v-if="addr.name">{{ addr.name }} {{ addr.phone }}</view>
+						<view class="text-grey text-sm" v-if="addr.name">{{addr.city+addr.county+" "+addr.addr}}</view>
+						<view class="text-grey text-sm" v-if="!addr.name">
+							请选择收货地址
+						</view>
 					</view>
 				</view>
 			</view>
 			<view class="balance-list margin-bottom-10">
 				<view class="balance-item flex padding-tb10-lr20 align-center size-28rpx solid-bottom" v-for="(item,index) in classifyData" :key="index">
 					<view class="left margin-right-10">
-						<image :src="item.src" mode=""></image>
+						<image :src="item.product.thumb" mode=""></image>
 					</view>
 					<view class="center flex flex-direction">
-						<text class="color-000 text-ellipsis">{{item.name}}</text>
-						<text class="size-24rpx color-9b text-ellipsis">{{item.desc}}</text>
+						<text class="color-000 text-ellipsis">{{item.product.name}}</text>
+						<text class="size-24rpx color-9b text-ellipsis">{{item.product.desc}}</text>
 					</view>
 					<view class="right flex flex-direction">
-						<text class="text-price color-000">{{item.price}}</text>
-						<text class="size-24rpx color-9b text-right margin-top-10">x {{item.count}}</text>
+						<text class="text-price color-000">{{filter.money(item.price)}}</text>
+						<text class="size-24rpx color-9b text-right margin-top-10">x {{item.num}}</text>
 					</view>
 				</view>
 			</view>
@@ -44,17 +51,17 @@
 					<view class="plan-item flex align-center sm-border solid-bottom" v-for="(item,i) in classifyData" :key="i">
 						<view class="left flex  align-center">
 							<view class="flex flex-direction">
-								<image :src="item.src" mode=""></image>
+								<image :src="item.product.thumb" mode=""></image>
 								<text class="text-ellipsis size-24rpx">{{item.name}}</text>
 							</view>
 							<view class="color-9b size-20rpx">
-								<text>x {{item.count}}</text>
+								<text>x {{item.num}}</text>
 							</view>
 						</view>
-						<view class="right flex justify-between" :class="{'error':sum(item.plan,item.count)}">
+						<view class="right flex justify-between" :class="{'error':sum(item.plan,item.num)}">
 							<view class="blk" v-for="(d,i1) in item.plan" :key="i1">
 								<!-- <text>{{d == 0 ? '-':d}}</text> -->
-								<picker @change="bindPickerChange" :data-row="i" :data-col="i1" :data-count="item.count" :value="d" :range="item.range">
+								<picker @change="bindPickerChange" :data-row="i" :data-col="i1" :data-count="item.num" :value="d" :range="item.range">
 									<text>{{d == 0 ? '-':d}}</text>
 								</picker>
 							</view>
@@ -67,38 +74,41 @@
 					<view class="content">
 						<text class="color-000">积分抵扣</text>
 					</view>
-					<view class="action">
-						<text class="text-grey text-sm">0积分</text>
+					<view class="action" style="width: 400rpx; text-align: right;">
+						<!-- <text class="text-grey text-sm">0积分</text> -->
+						<picker @change="bindPointChange" :value="index" :range="array" mode="selector">
+							<view class="uni-input text-grey">{{array[index]}}</view>
+						</picker>
 					</view>
 				</view>
-				<view class="cu-item arrow">
+				<view class="cu-item arrow" @tap="selectCoupon">
 					<view class="content">
 						<text class="color-000">优惠券</text>
 					</view>
 					<view class="action">
-						<text class="text-grey text-sm">-5<text class="text-price"></text></text>
+						<text class="text-grey"><text class="text-price"></text>-{{filter.money(currentCouponPrice) || 0}}</text>
 					</view>
 				</view>
 			</view>
 			<form>
 				<view class="cu-form-group">
 					<view class="title">备注</view>
-					<input placeholder="给我们留言(选填)" name="input"></input>
+					<input placeholder="给我们留言(选填)" name="input" v-model="remark"></input>
 				</view>
 			</form>
 			<view class="footer flex justify-between align-center padding-tb10-lr20">
 				<view class="total-price flex align-center">
 						<view class="">
-							<text class="size-28rpx">应付:<text class="text-price color-5ea046"></text><text class="price color-5ea046">122.30</text></text>
+							<text class="size-28rpx">应付:<text class="text-price color-5ea046"></text><text class="price color-5ea046">{{filter.money(totalPrice)}}</text></text>
 						</view>
 						<text class="margin-left-10">|</text>
 						
 						<view class="margin-left-10 size-24rpx">
-							<text>优惠:<text class="text-price"></text>5.00</text>
+							<text>优惠:<text class="text-price"></text>{{filter.money(currentPoint + currentCouponPrice)}}</text>
 						</view>
 				</view>
 				<view class="submit-btn">
-					<button type="primary" class="lg">提交订单</button>
+					<button type="primary" class="lg" @tap="submitOrder">提交订单</button>
 				</view>
 			</view>
 		</view>
@@ -106,30 +116,39 @@
 </template>
 
 <script>
-	import { mapState } from "vuex"
+	import { mapState,mapMutations } from "vuex"
 	import { weekText } from "../../common/util.js"
 	export default {
 		data() {
 			return {
-				d:{
-				"id":1,
-				"name": "泰国金1111枕榴莲1份 - 约500克",
-				"price": "18.00",
-				"oldPrice": "17.99",
-				"src": "http://ww1.sinaimg.cn/large/8b283c03gy1g5x4cpgtlpj206w078q4c.jpg",
-				"desc": "金枕榴莲,水果之王,香味浓郁,口岸软糯,营养丰富",
-				"key": "泰国金枕榴莲",
-				"cat":1,
-				"isSelect":false,
-				"count":3,
-				"plan":[0,0,0,0,0,0,0]
-				},
+				remark:"",
+				 array: [],
+				 index: 0,
+				 usePoint:0,
+				 useCoupon:0,
 			};
 		},
 		computed:{
 			...mapState({
-				classifyData:state => state.newBalance
+				classifyData:state => state.newBalance,
+				addr : state => state.addr,
+				point: state => state.user.point,
+				currentCoupon:state => state.currentCoupon,
+				currentPoint: state=> state.currentPoint,
+				currentCoupon: state => state.currentCoupon,
+				currentCouponPrice: state => state.currentCouponPrice
 			}),
+			totalPrice(){
+				const _t = this;
+				let total = 0;
+				this.classifyData.forEach(item => {
+					total += item.price  * item.num
+				})
+				total = total - _t.currentPoint - _t.currentCouponPrice
+				console.log(total)
+				_t.setCurrentPrice(total)
+				return total 
+			},
 			planDate(){
 				let d = [];
 				let time = new Date()
@@ -158,23 +177,119 @@
 			}
 			
 		},
-		created() {
-			console.log(this.classifyData)
+		onShow() {
+			const _t = this;
+			this.getAddrList()
+			_t.array = []
+			const pointArraylen = Math.floor(_t.point / 100)
+			for(let i=0;i<pointArraylen+1;i++){
+				_t.array.push(i*100)
+			}
 		},
 		methods:{
+			...mapMutations([
+				"getAddrList",
+				"setCurrentPoint",
+				"setCurrentPrice"
+			]),
 			sum(arr,count){
 				let sum = 0;
 				arr.forEach(item => sum+=item*1)
 				return sum == count ? false : true
 			},
+			bindPointChange(e) {
+				const _t = this;
+				
+				this.index = e.target.value
+				this.usePoint = _t.array[_t.index]
+				this.setCurrentPoint(_t.array[_t.index])
+
+			},
 			bindPickerChange (e) {
-				let _that = this;
+				let _t = this;
 				let row = e.target.dataset.row
 				let col = e.target.dataset.col
 				let count = e.target.dataset.count
 				this.classifyData[row].plan.splice(col, 1, e.target.value*1)
-				console.log(this.classifyData)
 			},
+			selectCoupon(){
+				const _t = this;
+				uni.navigateTo({
+					url:'/pages/user/coupon'
+				})
+
+			},
+			getAddress(){
+				const _t = this;
+				uni.navigateTo({
+					url:'/pages/user/addr/addr'
+				})
+			},
+			submitOrder(){
+				let _t = this;
+				console.log(_t.addr)
+				if(_t.addr.name == ""){
+					uni.showToast({
+						icon:"none",
+						title:"请选择收货地址"
+					})
+					return
+				}
+				
+				let planFlag = false
+				_t.classifyData.forEach(item => {
+					if(_t.sum(item.plan,item.num)){
+						planFlag = true
+					}
+				})
+				if(planFlag){
+					uni.showToast({
+						icon:"none",
+						title:"请检查配送计划"
+					})
+					return;
+				}
+				
+				
+				_t.$http.post({
+					url:"/mini/order/pay/",
+					data:{
+						list:_t.classifyData,
+						addr:_t.addr,
+						formId:"",
+						remark:_t.remark,
+						point:_t.currentPoint,
+						coupon:_t.currentCouponPrice
+					}
+				},(res) => {
+					uni.requestPayment({
+					    provider: 'wxpay',
+					    timeStamp: res.data.timeStamp,
+					    nonceStr: res.data.nonceStr,
+					    package: res.data.package,
+					    signType: res.data.signType,
+					    paySign: res.data.paySign,
+					    success: function (res) {
+							uni.showToast({
+								icon:"success",
+								title:"下单成功!",
+								duration:2000,
+								success() {
+									_t.clearCurrentCoupon();
+									_t.setCurrentCouponPrice(0);
+									_t.setCurrentPoint(0)
+									uni.navigateTo({
+										url:`/pages/orders/orders?tab=0&code=all`
+									})
+								}
+							})
+					    },
+					    fail: function (err) {
+					        console.log('fail:' + JSON.stringify(err));
+					    }
+					});
+				})
+			}
 		}
 	}
 </script>

@@ -12,8 +12,8 @@
 		<view class="page-body" :style="'height:'+height+'px'">
 			<scroll-view class="nav-left" scroll-y :style="'height:'+height+'px'" :scroll-top="scrollLeftTop" scroll-with-animation>
 				<view class="nav-left-item" @click="categoryClickMain(index)" :key="index" :class="index==categoryActive?'active':''"
-					v-for="(item,index) in classifyData">
-					{{item.name}}
+					v-for="(item,index) in goodslist">
+					{{item.title}}
 				</view>
 			</scroll-view>
 			<scroll-view class="nav-right" :scroll-top="scrollTop" @scroll="scroll" :style="'height:'+height+'px'" scroll-with-animation scroll-y>
@@ -23,23 +23,23 @@
 						<view>{{item.name}}</view>
 					</view>
 				</view> -->
-				<view class="good-list" :class="index == classifyData.length-1?'good-block':''" v-for="(foods,index) in classifyData" :key="index">
+				<view class="good-list" :class="index == goodslist.length-1?'good-block':''" v-for="(foods,index) in goodslist" :key="index">
 					<text class="good-item-title">{{foods.name}}</text>
-					<view class="good-item" :id="i==0?'first':''" v-for="(item,i) in foods.foods" :key="i">
+					<view class="good-item" :id="i==0?'first':''" v-for="(item,i) in foods.product" :key="i">
 						<view class="good-item-left">
-							<image :src="item.src" mode=""></image>
+							<image :src="item.img" mode=""></image>
 						</view>
 						<view class="good-item-right">
 							<text class="name">{{item.name}}</text>
 							<text class="desc text-ellipsis">{{item.desc}}</text>
 							<view class="ctrl-module">
 								<view class="price-list ">
-									<text class="new text-price">{{item.price}}</text>
-									<text class="old text-price">{{item.oldPrice}}</text>
+									<text class="new text-price">{{filter.money(item.price)}}</text>
+									<!-- <text class="old text-price">{{item.oldPrice}}</text> -->
 								</view>
 								<view class="ctrl-btns">
-									<button class="cu-btn line-green round sm" v-show="item.count>0" @click="changeCount(item,false)">-</button>
-									<text  v-show="item.count>0">{{item.count}}</text>
+									<button class="cu-btn line-green round sm" v-show="item.num>0" @click="changeCount(item,false)">-</button>
+									<text  v-show="item.num>0">{{item.num}}</text>
 									<button class="cu-btn bg-green round sm " @click="changeCount(item,true)">+</button>
 								</view>
 							</view>
@@ -70,12 +70,12 @@
 				leftItemHeight: 51,//49行会计算出新值进行覆盖
 				navLeftHeight:0,//左边scroll-view 内层nav的总高度
 				diff: 0,//左边scroll-view 内层nav的总高度与视口之差
-				tabBarHeight:0,//如果此页面为Tab页面，自己改变高度值,,一般tab高度为51
+				tabBarHeight:4,//如果此页面为Tab页面，自己改变高度值,,一般tab高度为51
 			}
 		},
 		computed:{
 			...mapState({
-				classifyData : state => state.goodslist,
+				goodslist:state => state.goodslist,
 				activeCate : state => state.activeCate
 			})
 		},
@@ -89,13 +89,13 @@
 			this.height = uni.getSystemInfoSync().windowHeight - this.tabBarHeight;
 		},
 		onReady() {
-			let _that = this;
+			let _t = this;
 			this.getHeightList();
 			
 		},
 		onShow(){
-			let _that = this;
-			this.categoryClickMain(_that.activeCate)
+			let _t = this;
+			this.categoryClickMain(_t.activeCate)
 		},
 		methods: {
 			...mapMutations([
@@ -112,7 +112,7 @@
 				})
 				selectorQuery.selectAll('.good-item').boundingClientRect(function(rects) {
 					_this.leftItemHeight  =  rects[0].height;
-					_this.navLeftHeight = _this.leftItemHeight * _this.classifyData.length;
+					_this.navLeftHeight = _this.leftItemHeight * _this.goodslist.length;
 					_this.diff =  _this.navLeftHeight - _this.height;
 				});
 				selectorQuery.selectAll('.good-list').boundingClientRect(function(rects) {
@@ -148,7 +148,7 @@
 						let height2 = _this.arr[i+1];
 						if (!height2 || (_this.scrollHeight >= height1 && _this.scrollHeight < height2)) {
 							_this.categoryActive = i;
-							(_this.diff>0) && (_this.scrollLeftTop = Math.round((_this.categoryActive * _this.diff)/(classifyData.length-1)));
+							(_this.diff>0) && (_this.scrollLeftTop = Math.round((_this.categoryActive * _this.diff)/(_this.goodslist.length-1)));
 							return false;
 						}
 					}

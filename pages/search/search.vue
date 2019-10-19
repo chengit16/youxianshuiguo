@@ -18,15 +18,15 @@
 					<text class="cuIcon-delete" @click="handleClearHistory"></text>
 				</view>
 				<view class="content flex flex-wrap">
-					<button v-for="(item,index) in history" :key="index" v-if="index < 8" @click="handleBtnSearch(item)" class="cu-btn sm margin-bottom-10 margin-right-20 color-9b">{{item.name}}</button>
+					<button v-for="(item,index) in history" :key="index" v-if="index < 8" @click="handleBtnSearch(item)" class="cu-btn sm margin-bottom-10 margin-right-20 color-9b">{{item}}</button>
 				</view>
 			</view>
 			<view class="search-hot">
 				<view class="title flex justify-between size-34rpx  margin-bottom-10">
 					<text>热门搜索</text>
 				</view>
-				<view class="content flex flex-wrap color-9b">
-					<button v-for="(item,index) in hot" :key="index" class="cu-btn sm margin-bottom-10 margin-right-20" @click="handleBtnSearch(item)" :class="item.more?'color-5ea046':'color-9b'">{{item.name}}</button>
+				<view class="content flex flex-wrap color-9b"> <!-- :class="item.more?'color-5ea046':'color-9b'" -->
+					<button v-for="(item,index) in hot" :key="index" class="cu-btn sm margin-bottom-10 margin-right-20" @click="handleBtnSearch(item)" >{{item}}</button>
 				</view>
 			</view>
 		</view>
@@ -35,20 +35,20 @@
 				<view class="good-list" >
 					<view class="good-item" v-for="(item,i) in list" :key="i">
 						<view class="good-item-left">
-							<image :src="item.src" mode=""></image>
+							<image :src="item.thumb" mode=""></image>
 						</view>
 						<view class="good-item-right">
 							<text class="name">{{item.name}}</text>
 							<text class="desc text-ellipsis">{{item.desc}}</text>
 							<view class="ctrl-module">
 								<view class="price-list ">
-									<text class="new text-price">{{item.price}}</text>
-									<text class="old text-price">{{item.oldPrice}}</text>
+									<text class="new text-price">{{filter.money(item.price)}}</text>
+									<text class="old text-price">{{filter.money(item.market)}}</text>
 								</view>
 								<view class="ctrl-btns">
-									<button class="cu-btn line-green round sm" v-show="item.count>0" @click="changeCount(item,false)">-</button>
-									<text  v-show="item.count>0">{{item.count}}</text>
-									<button class="cu-btn bg-green round sm " @click="changeCount(item,true)">+</button>
+									<button class="cu-btn line-green round sm" v-show="item.num>0" @click="changeGoodCount(item,false)">-</button>
+									<text  v-show="item.num>0">{{item.num}}</text>
+									<button class="cu-btn bg-green round sm " @click="changeGoodCount(item,true)">+</button>
 								</view>
 							</view>
 						</view>
@@ -62,87 +62,82 @@
 
 <script>
 	import noData from "../../components/noData/noData.vue"
-	import {testOrders} from "../../common/util.js"
 	import {mapMutations} from "vuex"
-	let testdata = []
-	testdata = testOrders[0].list;
-	testdata.forEach(item => {
-		item.count = 0
-	})
+	
 	export default {
 		components:{
 			noData
 		},
 		data() {
 			return {
-				history:[
-					{id:0,name:"巨峰葡萄"},
-					{id:1,name:"凯特芒果"},
-					{id:2,name:"西洲蜜瓜"},
-					{id:3,name:"早酥梨"},
-					{id:4,name:"泰国山竹"}
-				],
-				hot:[
-					{id:0,name:"巨峰葡萄",more:true},
-					{id:1,name:"凯特芒果",more:true},
-					{id:2,name:"西洲蜜瓜",more:false},
-					{id:3,name:"早酥梨",more:false},
-					{id:4,name:"泰国山竹",more:false},
-					{id:5,name:"云南红提",more:false},
-					{id:6,name:"百香果",more:false},
-					{id:7,name:"澳大利亚甜蜜橘",more:false}
-				],
-				list:testdata,
+				history:[],
+				hot:[],
+				list:[],
 				isNodata : false,
 				isSearching:false,
 				searchVal:"",
 				placeholder:"山竹"
 			}
 		},
+		onLoad() {
+				this.getHotSearch()
+		},
 		methods: {
 			...mapMutations([
-				"changeGoodCount"
+				"changeCount"
 			]),
-			changeCount(item,t){
-				this.changeGoodCount({item,t})
+			getHotSearch(){
+				let _t = this
+				_t.$http.post({
+					url:`/mini/search/hot/`,
+				},(res)=>{
+					_t.hot.push(...res.data)
+				})
+			},
+			changeGoodCount(item,t){
+				this.changeCount({item,t})
 			},
 			InputFocus(){
 				this.isSearching = false
 			},
 			InputBlur(e){
-				let _that = this;
+				let _t = this;
 				let val = e.detail.value
-				_that.searchVal = val == "" ? _that.placeholder : val
+				_t.searchVal = val == "" ? _t.placeholder : val
 			},
 			handleSearch(){
-				let _that = this
-				_that.isSearching = true
-				//
-				let arr = [true, false];
-				let bol = arr[Math.floor(Math.random()*arr.length)];
-				_that.isNodata = bol
-				_that.appendHistory()
+				let _t = this
+				_t.isSearching = true
+				if(_t.searchVal == ""){
+					_t.searchVal = _t.placeholder
+				}
+				_t.$http.post({
+					url:`/mini/search/`,
+					data:{
+						keyword:_t.searchVal
+					},
+				},res => {
+					console.log(res)
+					_t.list = [];
+					_t.list.push(...res.data)
+					if(_t.list.length == 0){
+						_t.isNodata = true
+					}
+				})
 				
+				_t.appendHistory()
 			},
 			handleBtnSearch(item){
-				let _that = this;
-				_that.searchVal = item.name
-				_that.isSearching = true
-				//
-				let arr = [true, false];
-				let bol = arr[Math.floor(Math.random()*arr.length)];
-				_that.isNodata = bol
-				_that.appendHistory()
+				let _t = this;
+				_t.searchVal = item
+				_t.handleSearch()
 			},
 			handleClearHistory(){
 				this.history = []
 			},
 			appendHistory(){
-				let _that = this;
-				_that.history.unshift({
-					name:_that.searchVal,
-					id:_that.history.length
-				})
+				let _t = this;
+				_t.history.unshift(_t.searchVal)
 			}
 		}
 	}
